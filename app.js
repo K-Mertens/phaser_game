@@ -43,6 +43,8 @@ let playerVelocityX = 500;
 let playerJumpForce = -500;
 let bullets;
 let lastFired = 0;
+let playerOneKey;
+let playerOneFacing;
 
 function preload() {
 	this.load.image('playerOne', 'assets/player_one.png');
@@ -119,13 +121,42 @@ function create() {
 
         update: function (time, delta)
         {
-            this.y -= this.speed * delta;
+        	if (playerOneFacing == 'left') {
+				this.x -= this.speed * delta;
+				if (this.x < -50) {
+					this.setActive(false);
+                	this.setVisible(false);
+				}
+        	}
+        	if (playerOneFacing == 'right') {
+				this.x += this.speed * delta;
+				if (this.x > gameConfig.width + 50) {
+					this.setActive(false);
+                	this.setVisible(false);
+				}
+        	}
+
+        	if (playerOneFacing == 'up') {
+				this.y -= this.speed * delta;
+				if (this.y < 50) {
+					this.setActive(false);
+                	this.setVisible(false);
+				}
+        	}
+
+        	if (false) {
+				this.y += this.speed * delta;
+				if (this.y > gameConfig.height + 50) {
+					this.setActive(false);
+                	this.setVisible(false);
+				}
+        	}
+            /*this.y -= this.speed * delta;
 
             if (this.y < -50)
             {
-                this.setActive(false);
-                this.setVisible(false);
-            }
+                
+            }*/
         }
 
     });
@@ -141,8 +172,21 @@ function create() {
 
 function update(time, delta) {
 	//game.physics.arcade.collide(playerOne, playerTwo);
+	//console.log(playerOneKey);
 	playerOne.setVelocityX(0);
 	playerTwo.setVelocityX(0);
+
+	if (playerOneKey == keyZ) {
+		playerOneFacing = 'up';
+	}
+
+	if (playerOneKey == keyD) {
+		playerOneFacing = 'right';
+	}
+
+	if (playerOneKey == keyQ) {
+		playerOneFacing = 'left';
+	}
 
 	playerOneText.x = playerOne.body.position.x + (playerOne.body.width / 2);
 	playerOneText.y = playerOne.body.position.y - 30;
@@ -151,14 +195,17 @@ function update(time, delta) {
 	
 	if(keyZ.isDown && playerOne.body.blocked.down) {
 		playerOne.setVelocityY(playerJumpForce);
+		playerOneKey = keyZ;
 	}
 
 	if(keyD.isDown) {
 		playerOne.setVelocityX(playerVelocityX);
+		playerOneKey = keyD;
 	}
 
 	if(keyQ.isDown) {
 		playerOne.setVelocityX(-playerVelocityX);
+		playerOneKey = keyQ;
 	}
 
 	if(cursors.up.isDown && playerTwo.body.blocked.down) {
@@ -176,6 +223,7 @@ function update(time, delta) {
 	if (keySpace.isDown && time > lastFired) {
         var bullet = bullets.get();
         if (bullet) {
+        	// ADD DIRECTION OF BULLET
             bullet.fire(playerOne.x, playerOne.y);
             lastFired = time + 50;
         }
